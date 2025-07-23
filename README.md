@@ -9,11 +9,13 @@ A modern, full-stack todo application built with React and Node.js featuring use
 ## ✨ Features
 
 - 🔐 **User Authentication** - Secure login system with session management
-- 📝 **Todo Management** - Create, view, and manage your personal todos
+- 📝 **Todo Management** - Create, edit, delete, and manage your personal todos
 - 🎨 **Modern UI** - Beautiful, responsive design with gradient backgrounds
 - 💾 **Persistent Sessions** - Stay logged in across browser sessions
 - 🚀 **Real-time Updates** - Instant todo creation and updates
 - 📱 **Mobile Responsive** - Works seamlessly on all devices
+- 🔧 **Environment Configuration** - Secure credential management with dotenv
+- ✨ **Input Validation** - Smart trimming and validation for better UX
 
 ## 🏗️ Tech Stack
 
@@ -29,6 +31,7 @@ A modern, full-stack todo application built with React and Node.js featuring use
 - **Express.js** - Web application framework
 - **CORS** - Cross-origin resource sharing
 - **Body Parser** - Request body parsing middleware
+- **dotenv** - Environment variable management
 
 ## 📋 Prerequisites
 
@@ -43,11 +46,42 @@ Before running this application, make sure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Miguel-Barca/react-todo-app-with-login.git
-cd react-todo-app-with-login
+git clone https://github.com/Miguel-Barca/basic-react-todo.git
+cd basic-react-todo
 ```
 
-### 2. Install Dependencies
+### 2. Set Up Environment Variables
+
+**For the Server:**
+
+```bash
+cd server
+cp .env.example .env
+```
+
+Edit the `.env` file to configure your credentials:
+
+```bash
+# Server Configuration
+PORT=4000
+NODE_ENV=development
+
+# CORS Configuration
+CLIENT_URL=http://localhost:3000
+
+# Authentication Configuration
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+
+# Default User Credentials (for demo purposes)
+DEFAULT_USERNAME=test
+DEFAULT_PASSWORD=test
+
+# Additional Users (comma-separated format: username:password)
+# Example: ADDITIONAL_USERS=admin:admin123,user:user456
+ADDITIONAL_USERS=
+```
+
+### 3. Install Dependencies
 
 Install server dependencies:
 
@@ -63,7 +97,7 @@ cd ../client
 npm install
 ```
 
-### 3. Start the Development Servers
+### 4. Start the Development Servers
 
 **Terminal 1 - Start the Backend Server:**
 
@@ -83,7 +117,7 @@ npm start
 
 The client will run on `http://localhost:3000`
 
-### 4. Access the Application
+### 5. Access the Application
 
 Open your browser and navigate to `http://localhost:3000`
 
@@ -91,8 +125,31 @@ Open your browser and navigate to `http://localhost:3000`
 
 Use these credentials to test the login functionality:
 
-- **Username:** `test`
-- **Password:** `test`
+- **Username:** `test` (or whatever you set in DEFAULT_USERNAME)
+- **Password:** `test` (or whatever you set in DEFAULT_PASSWORD)
+
+## 🔧 Configuration
+
+### Environment Variables
+
+The server uses environment variables for configuration. Key variables include:
+
+| Variable           | Description                                          | Default                 |
+| ------------------ | ---------------------------------------------------- | ----------------------- |
+| `PORT`             | Server port                                          | `4000`                  |
+| `CLIENT_URL`       | Client URL for CORS                                  | `http://localhost:3000` |
+| `JWT_SECRET`       | JWT signing secret                                   | Required for production |
+| `DEFAULT_USERNAME` | Default user username                                | `test`                  |
+| `DEFAULT_PASSWORD` | Default user password                                | `test`                  |
+| `ADDITIONAL_USERS` | Additional users (format: `user1:pass1,user2:pass2`) | Empty                   |
+
+### Adding Multiple Users
+
+You can add multiple users by setting the `ADDITIONAL_USERS` environment variable:
+
+```bash
+ADDITIONAL_USERS=admin:admin123,user:user456,demo:demo789
+```
 
 ## 📁 Project Structure
 
@@ -107,8 +164,11 @@ react-todo-app-with-login/
 │   │   └── ...
 │   └── package.json
 ├── server/                # Node.js backend
+│   ├── .env               # Environment variables (not in repo)
+│   ├── .env.example       # Environment variables template
 │   ├── server.js          # Express server with API endpoints
 │   └── package.json
+├── .gitignore             # Git ignore rules
 └── README.md
 ```
 
@@ -139,12 +199,15 @@ react-todo-app-with-login/
 - Centered login form with validation
 - Loading states and error handling
 - Demo credentials display
+- Real-time input trimming
 
 ### Todo Dashboard
 
 - Clean, card-based design
-- Header with logout functionality
+- Header with logout functionality and todo counter
 - Add todo input with Enter key support
+- Inline editing with save/cancel options
+- Delete functionality with confirmation
 - Todo list with empty state handling
 
 ## 🛠️ Development
@@ -165,42 +228,72 @@ react-todo-app-with-login/
 
 #### Adding New Users
 
-Edit `server/server.js` and modify the users array:
+You can add users in two ways:
 
-```javascript
-let users = [
-  { id: 1, username: 'test', password: 'test' },
-  { id: 2, username: 'newuser', password: 'newpassword' },
-];
-```
+1. **Environment Variables** (recommended):
+
+   ```bash
+   ADDITIONAL_USERS=newuser:newpassword,admin:admin123
+   ```
+
+2. **Direct server modification** (for development):
+   Edit `server/server.js` and modify the `initializeUsers` function.
 
 #### Styling
 
 Modify the `styles` objects in `Login.js` and `App.js` to customize the appearance.
+
+## 🔒 Security Features
+
+- **Input validation** with whitespace trimming
+- **Environment variable** management for sensitive data
+- **CORS configuration** for secure cross-origin requests
+- **Input sanitization** to prevent common attacks
+- **Visual feedback** for user actions
 
 ## 🔒 Security Notes
 
 - This is a demo application with basic authentication
 - Passwords are stored in plain text (not recommended for production)
 - No JWT validation on protected routes
-- For production use, implement proper password hashing and JWT verification
+- For production use, implement:
+  - Proper password hashing (bcrypt)
+  - Real JWT token validation
+  - Database storage for users
+  - Rate limiting
+  - HTTPS enforcement
 
 ## 🚀 Production Deployment
 
-### Build the Client
+### Environment Setup
 
-```bash
-cd client
-npm run build
-```
+1. **Set secure environment variables:**
 
-### Environment Variables
+   ```bash
+   NODE_ENV=production
+   JWT_SECRET=your-very-secure-secret-key
+   CLIENT_URL=https://your-frontend-domain.com
+   ```
+
+2. **Build the client:**
+
+   ```bash
+   cd client
+   npm run build
+   ```
+
+3. **Set up proper database** for user management
+
+4. **Implement password hashing** and JWT validation
+
+### Environment Variables for Production
 
 Set up proper environment variables for:
 
 - Database connection strings
-- JWT secrets
+- JWT secrets (use strong, random keys)
 - API base URLs
+- CORS origins
 
 ## 🤝 Contributing
 
