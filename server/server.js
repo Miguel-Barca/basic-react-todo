@@ -12,11 +12,25 @@ let nextId = 1;
 
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
+
+  // Trim whitespace for security and consistency
+  const trimmedUsername = username?.trim();
+  const trimmedPassword = password?.trim();
+
+  // Validate inputs
+  if (!trimmedUsername || !trimmedPassword) {
+    return res.status(400).json({
+      success: false,
+      message: 'Username and password cannot be empty or just whitespace',
+    });
+  }
+
   const user = users.find(
-    (u) => u.username === username && u.password === password
+    (u) => u.username === trimmedUsername && u.password === trimmedPassword
   );
+
   if (user) return res.json({ success: true, token: 'fake-jwt-token' });
-  res.status(401).json({ success: false });
+  res.status(401).json({ success: false, message: 'Invalid credentials' });
 });
 
 app.get('/todos', (req, res) => res.json(todos));
