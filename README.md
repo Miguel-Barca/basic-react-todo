@@ -16,6 +16,7 @@ A modern, full-stack todo application built with React and Node.js featuring use
 - 📱 **Mobile Responsive** - Works seamlessly on all devices
 - 🔧 **Environment Configuration** - Secure credential management with dotenv
 - ✨ **Input Validation** - Smart trimming and validation for better UX
+- 🧪 **Comprehensive Testing** - Full E2E testing with Playwright
 
 ## 🏗️ Tech Stack
 
@@ -33,6 +34,11 @@ A modern, full-stack todo application built with React and Node.js featuring use
 - **Body Parser** - Request body parsing middleware
 - **dotenv** - Environment variable management
 
+### Testing
+
+- **Playwright** - End-to-end testing framework
+- **TypeScript** - Type-safe test development
+
 ## 📋 Prerequisites
 
 Before running this application, make sure you have the following installed:
@@ -40,48 +46,24 @@ Before running this application, make sure you have the following installed:
 - **Node.js** (v18 or higher)
 - **npm** (comes with Node.js)
 - **Git** (for version control)
+- **Playwright browsers** (for testing - will be installed automatically)
 
 ## 🚀 Quick Start
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/Miguel-Barca/basic-react-todo.git
-cd basic-react-todo
+git clone https://github.com/Miguel-Barca/basic-react-todo-list.git
+cd basic-react-todo-list
 ```
 
-### 2. Set Up Environment Variables
+### 2. Install Dependencies
 
-**For the Server:**
+Install root dependencies:
 
 ```bash
-cd server
-cp .env.example .env
+npm install
 ```
-
-Edit the `.env` file to configure your credentials:
-
-```bash
-# Server Configuration
-PORT=4000
-NODE_ENV=development
-
-# CORS Configuration
-CLIENT_URL=http://localhost:3000
-
-# Authentication Configuration
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-
-# Default User Credentials (for demo purposes)
-DEFAULT_USERNAME=test
-DEFAULT_PASSWORD=test
-
-# Additional Users (comma-separated format: username:password)
-# Example: ADDITIONAL_USERS=admin:admin123,user:user456
-ADDITIONAL_USERS=admin:admin
-```
-
-### 3. Install Dependencies
 
 Install server dependencies:
 
@@ -95,6 +77,12 @@ Install client dependencies:
 ```bash
 cd ../client
 npm install
+```
+
+### 3. Install Playwright Browsers (for testing)
+
+```bash
+npx playwright install
 ```
 
 ### 4. Start the Development Servers
@@ -128,6 +116,59 @@ Use these credentials to test the login functionality:
 - **Username:** `test` (or whatever you set in DEFAULT_USERNAME)
 - **Password:** `test` (or whatever you set in DEFAULT_PASSWORD)
 
+## 🧪 Testing
+
+This project includes comprehensive end-to-end tests using Playwright.
+
+### Running Tests
+
+**Interactive UI Mode (Recommended for development):**
+
+```bash
+npm run test:ui
+```
+
+**Headed Mode (See browser actions):**
+
+```bash
+npm run test:ui:headed
+```
+
+**Standard Playwright Commands:**
+
+```bash
+# Run all tests
+npx playwright test
+
+# Run tests in headed mode
+npx playwright test --headed
+
+# Run specific test file
+npx playwright test tests/ui/todoListCreate.spec.ts
+
+# Run tests with debugging
+npx playwright test --debug
+```
+
+### Test Coverage
+
+The test suite covers:
+
+- ✅ **Authentication Flow** - Login with valid/invalid credentials
+- ✅ **Todo Creation** - Single and multiple todo items
+- ✅ **Todo Deletion** - Remove specific todo items
+- ✅ **Todo Updates** - Edit existing todo items
+- ✅ **Empty State** - Verify empty todo list display
+- ✅ **UI Snapshots** - Visual regression testing
+
+### Test Data Setup
+
+Tests use a setup file (`tests/ui/setup/setupItems.ts`) that automatically creates test data:
+
+- DELETE ITEM (for deletion tests)
+- UPDATE ITEM (for update tests)
+- CREATE ITEM (for various operations)
+
 ## 🔧 Configuration
 
 ### Environment Variables
@@ -154,7 +195,7 @@ ADDITIONAL_USERS=admin:admin123,user:user456,demo:demo789
 ## 📁 Project Structure
 
 ```
-react-todo-app-with-login/
+basic-react-todo-list/
 ├── client/                    # React frontend
 │   ├── public/               # Static files
 │   │   ├── index.html
@@ -179,10 +220,21 @@ react-todo-app-with-login/
 ├── tests/                    # Playwright testing
 │   └── ui/                   # UI tests
 │       ├── login.spec.ts     # Login functionality tests
+│       ├── todoListCreate.spec.ts    # Todo creation tests
+│       ├── todoListDelete.spec.ts    # Todo deletion tests
+│       ├── todoListUpdate.spec.ts    # Todo update tests
+│       ├── todoEmptyList.spec.ts     # Empty state tests
+│       ├── setup/
+│       │   └── setupItems.ts         # Test data setup
 │       └── helpers/
-│           └── loginScreenHelper.ts  # Login test helpers
-├── playwright-report/        # Test reports
-├── test-results/            # Test artifacts
+│           ├── loginScreenHelper.ts  # Login test helpers
+│           ├── createItemHelper.ts   # Todo creation helpers
+│           ├── deleteItemHelper.ts   # Todo deletion helpers
+│           ├── updateItemHelper.ts   # Todo update helpers
+│           ├── countItemHelper.ts    # Todo counting helpers
+│           └── types.ts              # TypeScript type definitions
+├── playwright-report/        # Test reports (generated)
+├── test-results/            # Test artifacts (generated)
 ├── playwright.config.ts     # Playwright configuration
 ├── .github/                 # GitHub workflows
 ├── .gitignore              # Git ignore rules
@@ -201,38 +253,14 @@ react-todo-app-with-login/
 - `PUT /todos/:id` - Update a todo
 - `DELETE /todos/:id` - Delete a todo
 
-## 🎨 UI Components
-
-### Login Screen
-
-- Modern gradient background
-- Centered login form with validation
-- Loading states and error handling
-- Demo credentials display
-- Real-time input trimming
-
-### Todo Dashboard
-
-- Clean, card-based design
-- Header with logout functionality and todo counter
-- Add todo input with Enter key support
-- Inline editing with save/cancel options
-- Delete functionality with confirmation
-- Todo list with empty state handling
-
 ## 🛠️ Development
 
 ### Available Scripts
 
-**Client (React):**
+**Root:**
 
-- `npm start` - Start development server
-- `npm build` - Build for production
-- `npm test` - Run tests
-
-**Server (Node.js):**
-
-- `npm start` - Start the Express server
+- `npm run test:ui` - Run Playwright tests in interactive UI mode
+- `npm run test:ui:headed` - Run Playwright tests in headed mode
 
 ### Customization
 
