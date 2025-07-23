@@ -1,0 +1,23 @@
+{
+  "name": "basic-react-todo-list",
+  "version": "1.0.0",
+  "description": "A modern, full-stack todo application built with React and Node.js featuring user authentication and a beautiful, responsive UI.",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Miguel-Barca/basic-react-todo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Miguel-Barca/basic-react-todo/issues"
+  },
+  "homepage": "https://github.com/Miguel-Barca/basic-react-todo#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.54.1",
+    "@types/node": "^24.1.0"
+  }
+}
