@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "A modern, full-stack todo application built with React and Node.js featuring user authentication and a beautiful, responsive UI.",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test:ui": "playwright test --ui",
+    "test:ui:headed": "playwright test --ui --headed"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Miguel-Barca/basic-react-todo.git"

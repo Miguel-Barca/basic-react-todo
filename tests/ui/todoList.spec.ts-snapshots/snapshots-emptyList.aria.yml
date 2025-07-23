@@ -1,0 +1,8 @@
+- heading "My Todo List" [level=2]
+- text: 0 todos
+- button "Logout"
+- textbox "Add a new todo..."
+- button "Add Todo" [disabled]
+- text: 📝
+- heading "No todos yet!" [level=3]
+- paragraph: Add your first todo above to get started.

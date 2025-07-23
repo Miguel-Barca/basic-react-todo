@@ -35,6 +35,25 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
+      name: 'login-ui',
+      testDir: './tests/ui',
+      testMatch: 'login.spec.ts',
+    },
+
+    {
+      name: 'todo-ui',
+      testDir: './tests/ui',
+      testMatch: 'todo*.spec.ts',
+      dependencies: ['create-items-setup'],
+    },
+
+    {
+      name: 'create-items-setup',
+      testDir: './tests/ui/setup',
+      testMatch: 'setupItems.ts',
+    },
+
+    {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },

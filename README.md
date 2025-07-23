@@ -78,7 +78,7 @@ DEFAULT_PASSWORD=test
 
 # Additional Users (comma-separated format: username:password)
 # Example: ADDITIONAL_USERS=admin:admin123,user:user456
-ADDITIONAL_USERS=
+ADDITIONAL_USERS=admin:admin
 ```
 
 ### 3. Install Dependencies
@@ -155,20 +155,39 @@ ADDITIONAL_USERS=admin:admin123,user:user456,demo:demo789
 
 ```
 react-todo-app-with-login/
-├── client/                 # React frontend
-│   ├── public/            # Static files
-│   ├── src/
-│   │   ├── App.js         # Main app component with auth logic
-│   │   ├── Login.js       # Login component
-│   │   ├── index.js       # React entry point
+├── client/                    # React frontend
+│   ├── public/               # Static files
+│   │   ├── index.html
+│   │   ├── favicon.ico
 │   │   └── ...
-│   └── package.json
-├── server/                # Node.js backend
-│   ├── .env               # Environment variables (not in repo)
-│   ├── .env.example       # Environment variables template
-│   ├── server.js          # Express server with API endpoints
-│   └── package.json
-├── .gitignore             # Git ignore rules
+│   ├── src/
+│   │   ├── App.js            # Main app component with auth logic
+│   │   ├── App.css           # App styling
+│   │   ├── Login.js          # Login component
+│   │   ├── index.js          # React entry point
+│   │   ├── index.css         # Global styles
+│   │   └── ...
+│   ├── package.json
+│   └── package-lock.json
+├── server/                   # Node.js backend
+│   ├── .env                  # Environment variables (not in repo)
+│   ├── .env.example          # Environment variables template
+│   ├── server.js             # Express server with API endpoints
+│   ├── package.json
+│   ├── package-lock.json
+│   └── node_modules/
+├── tests/                    # Playwright testing
+│   └── ui/                   # UI tests
+│       ├── login.spec.ts     # Login functionality tests
+│       └── helpers/
+│           └── loginScreenHelper.ts  # Login test helpers
+├── playwright-report/        # Test reports
+├── test-results/            # Test artifacts
+├── playwright.config.ts     # Playwright configuration
+├── .github/                 # GitHub workflows
+├── .gitignore              # Git ignore rules
+├── package.json            # Root package configuration
+├── package-lock.json       # Root dependencies lock
 └── README.md
 ```
 
@@ -177,15 +196,6 @@ react-todo-app-with-login/
 ### Authentication
 
 - `POST /login` - User login
-  ```json
-  {
-    "username": "test",
-    "password": "test"
-  }
-  ```
-
-### Todos
-
 - `GET /todos` - Get all todos
 - `POST /todos` - Create a new todo
 - `PUT /todos/:id` - Update a todo
@@ -239,69 +249,11 @@ You can add users in two ways:
 2. **Direct server modification** (for development):
    Edit `server/server.js` and modify the `initializeUsers` function.
 
-#### Styling
-
-Modify the `styles` objects in `Login.js` and `App.js` to customize the appearance.
-
-## 🔒 Security Features
-
-- **Input validation** with whitespace trimming
-- **Environment variable** management for sensitive data
-- **CORS configuration** for secure cross-origin requests
-- **Input sanitization** to prevent common attacks
-- **Visual feedback** for user actions
-
 ## 🔒 Security Notes
 
 - This is a demo application with basic authentication
 - Passwords are stored in plain text (not recommended for production)
 - No JWT validation on protected routes
-- For production use, implement:
-  - Proper password hashing (bcrypt)
-  - Real JWT token validation
-  - Database storage for users
-  - Rate limiting
-  - HTTPS enforcement
-
-## 🚀 Production Deployment
-
-### Environment Setup
-
-1. **Set secure environment variables:**
-
-   ```bash
-   NODE_ENV=production
-   JWT_SECRET=your-very-secure-secret-key
-   CLIENT_URL=https://your-frontend-domain.com
-   ```
-
-2. **Build the client:**
-
-   ```bash
-   cd client
-   npm run build
-   ```
-
-3. **Set up proper database** for user management
-
-4. **Implement password hashing** and JWT validation
-
-### Environment Variables for Production
-
-Set up proper environment variables for:
-
-- Database connection strings
-- JWT secrets (use strong, random keys)
-- API base URLs
-- CORS origins
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 ## 📝 License
 
@@ -312,13 +264,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Miguel Barca**
 
 - GitHub: [@Miguel-Barca](https://github.com/Miguel-Barca)
-
-## 🙏 Acknowledgments
-
-- React team for the amazing framework
-- Express.js for the simple and flexible server framework
-- The open-source community for inspiration and tools
-
----
-
-**⭐ Star this repository if you found it helpful!**
