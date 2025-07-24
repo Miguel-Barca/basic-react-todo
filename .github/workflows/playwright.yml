@@ -13,80 +13,43 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-      - name: Install dependencies
+
+      - name: Install root dependencies
         run: npm ci
-      - name: Start server
+
+      - name: Install server dependencies and start server
         run: |
-          cd server && npm ci && npm start &
+          cd server
+          npm ci
+          npm start &
           sleep 5
-      - name: Postman API tests
+
+      - name: Install client dependencies and start client
+        run: |
+          cd client
+          npm ci
+          CI=true npm start &
+          sleep 10
+        env:
+          CI: true
+
+      - name: Wait for services to be ready
+        run: |
+          timeout 120 bash -c 'until curl -s http://localhost:4000/health > /dev/null 2>&1 || curl -s http://localhost:4000 > /dev/null 2>&1; do echo "Waiting for server..."; sleep 3; done'
+          timeout 120 bash -c 'until curl -s http://localhost:3000 > /dev/null 2>&1; do echo "Waiting for client..."; sleep 3; done'
+          echo "✅ Services are ready!"
+
+      - name: Run Postman API tests
         run: |
           npm install -g newman
           newman run api-testing/postman_collection.json
-      - name: Debug workspace structure
-        run: |
-          echo "🔍 Current directory: $(pwd)"
-          echo "📁 Directory contents:"
-          ls -la
-          echo "📁 Checking for client directory:"
-          ls -la client/ || echo "❌ Client directory not found"
-      - name: Check client package.json
-        run: |
-          echo "🔍 Checking client package.json:"
-          if [ -f client/package.json ]; then
-            echo "✅ client/package.json exists"
-            cat client/package.json | head -20
-          else
-            echo "❌ client/package.json NOT found"
-            echo "📁 Contents of client directory:"
-            ls -la client/
-          fi
-      - name: Install client dependencies
-        run: |
-          cd client
-          if [ -f package.json ]; then
-            npm ci --verbose
-            echo "✅ Client dependencies installed"
-          else
-            echo "❌ No package.json in client directory - installing in root"
-            cd ..
-            npm ci
-          fi
-      - name: Start client in background
-        run: |
-          if [ -f client/package.json ]; then
-            echo "🚀 Starting React app from client directory"
-            cd client
-            echo "📦 Available scripts in client:"
-            npm run
-            CI=true npm start &
-          else
-            echo "🚀 Starting React app from root directory"
-            echo "📦 Available scripts in root:"
-            npm run
-            if npm run | grep -q "start"; then
-              CI=true npm start &
-            else
-              echo "❌ No start script found. Checking if this is a React app..."
-              if [ -f src/App.js ]; then
-                echo "✅ Found React app in root, using react-scripts directly"
-                CI=true npx react-scripts start &
-              else
-                echo "❌ No React app found in root either"
-                exit 1
-              fi
-            fi
-          fi
-        env:
-          CI: true
-      - name: Wait for client to be ready
-        run: |
-          timeout 120 bash -c 'until curl -s http://localhost:3000 > /dev/null; do echo "Waiting for client..."; sleep 3; done'
-          echo "✅ Client is ready!"
+
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+
       - name: Run Playwright tests
         run: npx playwright test
+
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
