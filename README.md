@@ -258,92 +258,6 @@ The Postman collection includes tests for:
 - ✅ **Status Codes** - Correct HTTP status codes for all scenarios
 - ✅ **Data Structure** - Response format validation
 
-The collection uses variables for flexibility:
-
-| Variable            | Description                | Default Value           |
-| ------------------- | -------------------------- | ----------------------- |
-| `baseUrl`           | API server URL             | `http://localhost:4000` |
-| `testUsername`      | Login username             | `test`                  |
-| `testPassword`      | Login password             | `test`                  |
-| `authToken`         | Authentication token       | Auto-generated          |
-| `lastCreatedTodoId` | ID of last created todo    | Auto-generated          |
-| `testTodoId`        | ID for update/delete tests | Auto-generated          |
-| `sampleTodoText`    | Default todo text          | `Sample todo item`      |
-| `updatedTodoText`   | Updated todo text          | `Updated todo item`     |
-
-### 📈 CI/CD Integration
-
-Add Newman to your continuous integration pipeline:
-
-#### GitHub Actions Example
-
-```yaml
-name: API Tests
-on: [push, pull_request]
-
-jobs:
-  api-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Start server
-        run: |
-          cd server && npm ci && npm start &
-          sleep 5
-
-      - name: Run API tests
-        run: |
-          npm install -g newman
-          newman run api-testing/postman_collection.json \
-            --reporters cli,html \
-            --reporter-html-export api-test-results.html
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: api-test-results
-          path: api-test-results.html
-```
-
-### 🛠️ Development Workflow
-
-1. **Develop API endpoint** in `server/server.js`
-2. **Test manually** with Postman UI
-3. **Add/update tests** in the collection
-4. **Validate with Newman** command line
-5. **Run in CI/CD** pipeline for automated validation
-
-## 🔧 Configuration
-
-### Environment Variables
-
-The server uses environment variables for configuration. Key variables include:
-
-| Variable           | Description                                          | Default                 |
-| ------------------ | ---------------------------------------------------- | ----------------------- |
-| `PORT`             | Server port                                          | `4000`                  |
-| `CLIENT_URL`       | Client URL for CORS                                  | `http://localhost:3000` |
-| `JWT_SECRET`       | JWT signing secret                                   | Required for production |
-| `DEFAULT_USERNAME` | Default user username                                | `test`                  |
-| `DEFAULT_PASSWORD` | Default user password                                | `test`                  |
-| `ADDITIONAL_USERS` | Additional users (format: `user1:pass1,user2:pass2`) | Empty                   |
-
-### Adding Multiple Users
-
-You can add multiple users by setting the `ADDITIONAL_USERS` environment variable:
-
-```bash
-ADDITIONAL_USERS=admin:admin123,user:user456,demo:demo789
-```
-
 ## 📁 Project Structure
 
 ```
@@ -409,9 +323,7 @@ basic-react-todo-list/
 - `PUT /todos/:id` - Update a todo
 - `DELETE /todos/:id` - Delete a todo
 
-## 🛠️ Development
-
-### Available Scripts
+## 🛠️ Available Scripts
 
 **Root:**
 
@@ -421,23 +333,6 @@ basic-react-todo-list/
 **API Testing:**
 
 - `newman run api-testing/postman_collection.json` - Run all API tests
-- `newman run api-testing/postman_collection.json --reporters cli,html` - Run with HTML report
-- `newman run api-testing/postman_collection.json --folder "Authentication"` - Run specific test group
-
-### Customization
-
-#### Adding New Users
-
-You can add users in two ways:
-
-1. **Environment Variables** (recommended):
-
-   ```bash
-   ADDITIONAL_USERS=newuser:newpassword,admin:admin123
-   ```
-
-2. **Direct server modification** (for development):
-   Edit `server/server.js` and modify the `initializeUsers` function.
 
 ## 🔒 Security Notes
 
