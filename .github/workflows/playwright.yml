@@ -30,20 +30,53 @@ jobs:
           ls -la
           echo "📁 Checking for client directory:"
           ls -la client/ || echo "❌ Client directory not found"
+      - name: Check client package.json
+        run: |
+          echo "🔍 Checking client package.json:"
+          if [ -f client/package.json ]; then
+            echo "✅ client/package.json exists"
+            cat client/package.json | head -20
+          else
+            echo "❌ client/package.json NOT found"
+            echo "📁 Contents of client directory:"
+            ls -la client/
+          fi
       - name: Install client dependencies
         run: |
           cd client
-          npm ci --verbose
-          echo "✅ Client dependencies installed"
-          npm list react-scripts || echo "⚠️ react-scripts not found"
+          if [ -f package.json ]; then
+            npm ci --verbose
+            echo "✅ Client dependencies installed"
+          else
+            echo "❌ No package.json in client directory - installing in root"
+            cd ..
+            npm ci
+          fi
       - name: Start client in background
         run: |
-          cd client
-          echo "📁 Current directory: $(pwd)"
-          echo "📦 Available scripts:"
-          npm run
-          echo "🚀 Starting client..."
-          CI=true npm start &
+          if [ -f client/package.json ]; then
+            echo "🚀 Starting React app from client directory"
+            cd client
+            echo "📦 Available scripts in client:"
+            npm run
+            CI=true npm start &
+          else
+            echo "🚀 Starting React app from root directory"
+            echo "📦 Available scripts in root:"
+            npm run
+            if npm run | grep -q "start"; then
+              CI=true npm start &
+            else
+              echo "❌ No start script found. Checking if this is a React app..."
+              if [ -f src/App.js ]; then
+                echo "✅ Found React app in root, using react-scripts directly"
+                CI=true npx react-scripts start &
+              else
+                echo "❌ No React app found in root either"
+                exit 1
+              fi
+            fi
+          fi
         env:
           CI: true
       - name: Wait for client to be ready
