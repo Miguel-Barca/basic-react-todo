@@ -39,7 +39,7 @@ A comprehensive testing approach for our full-stack todo app.
 
 ## Test Coverage Breakdown
 
-### Frontend Testing with Playwright 🎭
+### Frontend Testing with Playwright/Typescript 🎭
 
 | What We Test     | Status     |
 | ---------------- | ---------- |
@@ -50,7 +50,7 @@ A comprehensive testing approach for our full-stack todo app.
 | Empty States     | ✅ Covered |
 | Multi-user Setup | ✅ Covered |
 
-### Backend Testing with Postman 📮
+### Backend Testing with Postman / Newman 📮
 
 | API Endpoint   | Status     |
 | -------------- | ---------- |
@@ -61,9 +61,9 @@ A comprehensive testing approach for our full-stack todo app.
 
 ## Why These Tools?
 
-### Playwright for UI Testing 🎪
+### Playwright/Typescript for UI Testing 🎭
 
-- **Actually works across browsers** - Chrome, Firefox, Safari all supported
+- **Support across multiple browsers** - Chrome, Firefox, Safari all supported
 - **Great debugging tools** - See exactly what went wrong and when
 - **Parallel Execution** - Fast test execution with parallel running
 - **Auto-waiting** - Reduced flaky tests from timing issues
@@ -124,25 +124,20 @@ _Runs on http://localhost:3000_
 
 #### UI Tests (Playwright) 🎮
 
-**Run everything:**
+**From the root directory:**
 
 ```bash
-npm run test:ui
-```
+# Run all tests
+npx playwright test
 
-**Watch tests run (recommended for debugging):**
+# Run tests in headed mode (see the browser)
+npx playwright test --headed
 
-```bash
-npm run test:ui:headed
-```
+# Run specific test file
+npx playwright test tests/ui/todoListCreate.spec.ts
 
-**Test specific features:**
-
-```bash
-# Just the login stuff
+# Run tests for specific project
 npx playwright test --project=login-ui
-
-# Just the todo functionality
 npx playwright test --project=todo-ui
 ```
 
@@ -180,4 +175,10 @@ newman run api-testing/postman_collection.json
 
 ---
 
-_This testing strategy evolves with the app. Found a bug? Great! Let's write a test for it._
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👤 Author
+
+**Miguel Barca**
