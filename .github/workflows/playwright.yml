@@ -23,11 +23,27 @@ jobs:
         run: |
           npm install -g newman
           newman run api-testing/postman_collection.json
+      - name: Debug workspace structure
+        run: |
+          echo "🔍 Current directory: $(pwd)"
+          echo "📁 Directory contents:"
+          ls -la
+          echo "📁 Checking for client directory:"
+          ls -la client/ || echo "❌ Client directory not found"
       - name: Install client dependencies
-        run: cd client && npm ci
+        run: |
+          cd client
+          npm ci --verbose
+          echo "✅ Client dependencies installed"
+          npm list react-scripts || echo "⚠️ react-scripts not found"
       - name: Start client in background
         run: |
-          cd client && CI=true npm start &
+          cd client
+          echo "📁 Current directory: $(pwd)"
+          echo "📦 Available scripts:"
+          npm run
+          echo "🚀 Starting client..."
+          CI=true npm start &
         env:
           CI: true
       - name: Wait for client to be ready
