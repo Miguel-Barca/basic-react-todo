@@ -7,8 +7,12 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:3000' }));
 
-let todos = [];
-let nextId = 1;
+// Store todos per user and track next IDs per user
+let userTodos = {}; // { userId: [todos] }
+let userNextId = {}; // { userId: nextId }
+
+// Store active sessions
+let activeSessions = {}; // { token: { userId, username, createdAt } }
 
 // Initialize users from environment variables
 const initializeUsers = () => {
@@ -45,6 +49,40 @@ const initializeUsers = () => {
 
 let users = initializeUsers();
 
+// Authentication middleware
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: 'Access denied. No token provided.',
+    });
+  }
+
+  // Check if token exists in active sessions
+  const session = activeSessions[token];
+  if (!session) {
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid or expired token.',
+    });
+  }
+
+  // Add user info to request
+  req.user = session;
+  next();
+};
+
+// Helper function to ensure user has todo storage initialized
+const ensureUserTodoStorage = (userId) => {
+  if (!userTodos[userId]) {
+    userTodos[userId] = [];
+    userNextId[userId] = 1;
+  }
+};
+
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
@@ -65,36 +103,95 @@ app.post('/login', (req, res) => {
   );
 
   if (user) {
-    // In production, use proper JWT signing with the secret
-    const token = process.env.JWT_SECRET
-      ? `jwt-${Date.now()}`
-      : 'fake-jwt-token';
-    return res.json({ success: true, token });
+    // Generate a session token
+    const token = `session-${user.id}-${Date.now()}-${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
+
+    // Store session
+    activeSessions[token] = {
+      userId: user.id,
+      username: user.username,
+      createdAt: Date.now(),
+    };
+
+    // Initialize user's todo storage if not exists
+    ensureUserTodoStorage(user.id);
+
+    return res.json({
+      success: true,
+      token,
+      user: { id: user.id, username: user.username },
+    });
   }
 
   res.status(401).json({ success: false, message: 'Invalid credentials' });
 });
 
-app.get('/todos', (req, res) => res.json(todos));
+// Logout endpoint to invalidate token
+app.post('/logout', authenticateToken, (req, res) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
 
-app.post('/todos', (req, res) => {
-  const todo = { id: nextId++, text: req.body.text };
-  todos.push(todo);
+  if (token && activeSessions[token]) {
+    delete activeSessions[token];
+  }
+
+  res.json({ success: true, message: 'Logged out successfully' });
+});
+
+// Get todos for the authenticated user
+app.get('/todos', authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  ensureUserTodoStorage(userId);
+  res.json(userTodos[userId]);
+});
+
+// Create a new todo for the authenticated user
+app.post('/todos', authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  ensureUserTodoStorage(userId);
+
+  const todo = {
+    id: userNextId[userId]++,
+    text: req.body.text,
+  };
+
+  userTodos[userId].push(todo);
   res.status(201).json(todo);
 });
 
-app.put('/todos/:id', (req, res) => {
-  const t = todos.find((x) => x.id === +req.params.id);
-  if (t) {
-    t.text = req.body.text;
-    return res.json(t);
+// Update a todo for the authenticated user
+app.put('/todos/:id', authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  const todoId = +req.params.id;
+
+  ensureUserTodoStorage(userId);
+
+  const todo = userTodos[userId].find((t) => t.id === todoId);
+  if (todo) {
+    todo.text = req.body.text;
+    return res.json(todo);
   }
-  res.status(404).end();
+
+  res.status(404).json({ success: false, message: 'Todo not found' });
 });
 
-app.delete('/todos/:id', (req, res) => {
-  todos = todos.filter((x) => x.id !== +req.params.id);
-  res.json({ deleted: true });
+// Delete a todo for the authenticated user
+app.delete('/todos/:id', authenticateToken, (req, res) => {
+  const userId = req.user.userId;
+  const todoId = +req.params.id;
+
+  ensureUserTodoStorage(userId);
+
+  const initialLength = userTodos[userId].length;
+  userTodos[userId] = userTodos[userId].filter((t) => t.id !== todoId);
+
+  if (userTodos[userId].length < initialLength) {
+    res.json({ deleted: true });
+  } else {
+    res.status(404).json({ success: false, message: 'Todo not found' });
+  }
 });
 
 const PORT = process.env.PORT || 4000;

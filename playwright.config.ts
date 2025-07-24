@@ -44,13 +44,20 @@ export default defineConfig({
       name: 'todo-ui',
       testDir: './tests/ui',
       testMatch: 'todo*.spec.ts',
-      dependencies: ['create-items-setup'],
+      dependencies: ['setup-todo-lists'],
+      teardown: 'teardown-todo-lists',
     },
 
     {
-      name: 'create-items-setup',
+      name: 'setup-todo-lists',
       testDir: './tests/ui/setup',
       testMatch: 'setupItems.ts',
+    },
+
+    {
+      name: 'teardown-todo-lists',
+      testDir: './tests/ui/teardown',
+      testMatch: 'teardown.ts',
     },
 
     //{

@@ -39,3 +39,19 @@ export async function deleteTodoItem(page: Page, item: TodoItem) {
     { box: true }
   );
 }
+
+export async function deleteAllTodoItems(page: Page) {
+  await test.step(
+    'delete all todo items',
+    async () => {
+      const deleteButton = page.getByRole('button', {
+        name: '🗑️ Delete',
+      });
+
+      while ((await deleteButton.count()) > 0) {
+        await deleteButton.first().click();
+      }
+    },
+    { box: true }
+  );
+}

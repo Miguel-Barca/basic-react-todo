@@ -31,6 +31,14 @@
                   "    pm.expect(responseJson).to.have.property('token');",
                   "});",
                   "",
+                  "// Save auth token for subsequent requests",
+                  "pm.test('Auth token should be saved to collection variables', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    if (responseJson.success && responseJson.token) {",
+                  "        pm.collectionVariables.set('authToken', responseJson.token);",
+                  "        console.log('✅ Auth token saved for future requests');",
+                  "    }",
+                  "});",
                   ""
                 ],
                 "type": "text/javascript",
@@ -165,20 +173,32 @@
           ],
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/todos",
               "host": ["{{baseUrl}}"],
               "path": ["todos"]
             },
-            "description": "Retrieve all todo items from the server"
+            "description": "Retrieve all todo items from the server (requires authentication)"
           },
           "response": [
             {
               "name": "Success - Empty List",
               "originalRequest": {
                 "method": "GET",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
                 "url": {
                   "raw": "{{baseUrl}}/todos",
                   "host": ["{{baseUrl}}"],
@@ -201,7 +221,13 @@
               "name": "Success - With Todos",
               "originalRequest": {
                 "method": "GET",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
                 "url": {
                   "raw": "{{baseUrl}}/todos",
                   "host": ["{{baseUrl}}"],
@@ -274,6 +300,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
               }
             ],
             "body": {
@@ -285,7 +316,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["todos"]
             },
-            "description": "Create a new todo item. Requires 'text' field in the request body."
+            "description": "Create a new todo item. Requires 'text' field in the request body and authentication."
           },
           "response": [
             {
@@ -296,6 +327,11 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
                   }
                 ],
                 "body": {
@@ -372,6 +408,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
               }
             ],
             "body": {
@@ -383,7 +424,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["todos", "{{testTodoId}}"]
             },
-            "description": "Update an existing todo item by ID. Requires 'text' field in the request body."
+            "description": "Update an existing todo item by ID. Requires 'text' field in the request body and authentication."
           },
           "response": [
             {
@@ -394,6 +435,11 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
                   }
                 ],
                 "body": {
@@ -426,6 +472,11 @@
                   {
                     "key": "Content-Type",
                     "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
                   }
                 ],
                 "body": {
@@ -476,20 +527,32 @@
           ],
           "request": {
             "method": "DELETE",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}/todos/{{testTodoId}}",
               "host": ["{{baseUrl}}"],
               "path": ["todos", "{{testTodoId}}"]
             },
-            "description": "Delete a todo item by ID"
+            "description": "Delete a todo item by ID (requires authentication)"
           },
           "response": [
             {
               "name": "Success",
               "originalRequest": {
                 "method": "DELETE",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
                 "url": {
                   "raw": "{{baseUrl}}/todos/1",
                   "host": ["{{baseUrl}}"],
@@ -511,7 +574,7 @@
           ]
         }
       ],
-      "description": "CRUD operations for todo items"
+      "description": "CRUD operations for todo items (all require authentication)"
     }
   ],
   "event": [

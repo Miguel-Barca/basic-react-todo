@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Login from './Login';
 
 function App() {
@@ -9,6 +9,39 @@ function App() {
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState('');
 
+  // Define fetchTodos before useEffect that uses it
+  const fetchTodos = useCallback(() => {
+    if (!authToken) {
+      console.warn('No auth token available for fetching todos');
+      return;
+    }
+
+    fetch('http://localhost:4000/todos', {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        // Ensure data is an array
+        if (Array.isArray(data)) {
+          setTodos(data);
+        } else {
+          console.error('Expected array but got:', data);
+          setTodos([]);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to fetch todos:', err);
+        setTodos([]); // Ensure todos is always an array
+      });
+  }, [authToken]);
+
   // Check for existing auth token on component mount
   useEffect(() => {
     const token = localStorage.getItem('authToken');
@@ -18,33 +51,39 @@ function App() {
     }
   }, []);
 
-  // Fetch todos when authenticated
+  // Fetch todos when authenticated and token is available
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && authToken) {
       fetchTodos();
     }
-  }, [isAuthenticated]);
-
-  const fetchTodos = () => {
-    fetch('http://localhost:4000/todos')
-      .then((res) => res.json())
-      .then((data) => setTodos(data))
-      .catch((err) => console.error('Failed to fetch todos:', err));
-  };
+  }, [isAuthenticated, authToken, fetchTodos]);
 
   const handleLogin = (token) => {
     setAuthToken(token);
     setIsAuthenticated(true);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    setAuthToken(null);
-    setIsAuthenticated(false);
-    setTodos([]);
-    setText('');
-    setEditingId(null);
-    setEditText('');
+  const handleLogout = async () => {
+    try {
+      // Call server logout endpoint to invalidate session
+      await fetch('http://localhost:4000/logout', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+    } catch (err) {
+      console.warn('Failed to logout on server:', err);
+    } finally {
+      // Clear client-side state regardless of server response
+      localStorage.removeItem('authToken');
+      setAuthToken(null);
+      setIsAuthenticated(false);
+      setTodos([]);
+      setText('');
+      setEditingId(null);
+      setEditText('');
+    }
   };
 
   const addTodo = () => {

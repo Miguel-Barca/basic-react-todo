@@ -16,7 +16,7 @@ test.describe('update todo items', () => {
 
     await test.step(`check if todo item '${newItem.name}' is on the list`, async () => {
       await expect(
-        page.getByText(`${newItem.name}✏️ Edit🗑️ Delete`)
+        page.getByText(`${newItem.name}✏️ Edit🗑️ Delete`).first()
       ).toBeVisible();
     });
   });
