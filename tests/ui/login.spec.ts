@@ -25,6 +25,6 @@ test('enter invalid credentials and check error message is shown', async ({
   await enterCredentials(page, 'invalid', 'invalid');
 
   await test.step('check error message is shown', async () => {
-    await expect(page.getByText('Invalid username or password')).toBeVisible();
+    await expect(page.getByText('Invalid credentials')).toBeVisible();
   });
 });
